@@ -1,0 +1,539 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#105c35">
+<meta name="description" content="MANJESH Calculator - Smart, simple and scientific calculator for everyday calculations.">
+<title>MANJESH Calculator | Smart Calculator</title>
+
+<style>
+:root{
+ --green:#147d45;
+ --darkgreen:#105c35;
+ --orange:#ff8700;
+ --bg:#edf4ef;
+ --panel:#ffffff;
+ --key:#f2f6f3;
+ --text:#17251c;
+ --muted:#839187;
+ --line:#e4ebe5;
+ --shadow:0 12px 35px rgba(16,92,53,.09);
+}
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Inter,Arial,sans-serif;
+ background:var(--bg);
+ color:var(--text);
+ transition:.25s;
+}
+body.dark{
+ --bg:#101812;
+ --panel:#1a271e;
+ --key:#26362b;
+ --text:#f4fff5;
+ --muted:#9aab9e;
+ --line:#334337;
+ --shadow:0 12px 35px rgba(0,0,0,.22);
+}
+button{font-family:inherit;cursor:pointer}
+.app{
+ width:100%;max-width:470px;
+ min-height:100vh;margin:auto;
+ padding:20px 17px 30px;
+}
+.header{
+ display:flex;justify-content:space-between;
+ align-items:center;margin-bottom:22px;
+}
+.brand{display:flex;align-items:center;gap:11px}
+.logo{
+ width:46px;height:46px;border-radius:15px;
+ display:grid;place-items:center;
+ background:linear-gradient(135deg,var(--green),var(--darkgreen));
+ color:white;font-size:23px;font-weight:800;
+ box-shadow:0 5px 14px #147d4535;
+}
+.brand h1{font-size:19px;margin:0;font-weight:800}
+.brand p{font-size:11px;color:var(--muted);margin:4px 0 0}
+.icon-btn{
+ border:1px solid var(--line);background:var(--panel);
+ color:var(--text);width:42px;height:42px;
+ border-radius:13px;font-size:19px;
+}
+.display-card{
+ background:var(--panel);border:1px solid var(--line);
+ border-radius:23px;padding:20px 17px;
+ box-shadow:var(--shadow);margin-bottom:17px;
+}
+.display-label{
+ font-size:11px;color:var(--muted);
+ text-transform:uppercase;letter-spacing:1.5px;
+}
+.expression{
+ min-height:32px;text-align:right;
+ font-size:17px;color:var(--muted);
+ margin-top:14px;overflow-wrap:anywhere;
+}
+.result{
+ display:block;width:100%;border:0;outline:0;
+ background:transparent;color:var(--text);
+ font-size:clamp(34px,9vw,45px);
+ font-weight:750;text-align:right;
+ margin:5px 0 17px;
+}
+.display-footer{
+ display:flex;align-items:center;
+ justify-content:space-between;gap:8px;
+}
+.status{font-size:11px;color:var(--muted)}
+.small-actions{display:flex;gap:7px}
+.small-btn{
+ border:1px solid var(--line);border-radius:10px;
+ padding:8px 11px;background:var(--key);
+ color:var(--green);font-size:12px;font-weight:700;
+}
+.tabs{
+ display:flex;padding:5px;
+ background:var(--panel);
+ border:1px solid var(--line);
+ border-radius:14px;gap:5px;margin-bottom:13px;
+}
+.tab{
+ flex:1;border:0;padding:11px 5px;
+ border-radius:10px;background:transparent;
+ color:var(--muted);font-weight:700;font-size:13px;
+}
+.tab.active{
+ background:var(--green);color:white;
+}
+.science{
+ display:none;grid-template-columns:repeat(4,1fr);
+ gap:8px;margin-bottom:12px;
+}
+.science.show{display:grid}
+.science button{
+ height:43px;border:1px solid var(--line);
+ border-radius:12px;background:var(--panel);
+ color:var(--green);font-weight:700;font-size:13px;
+}
+.keypad{
+ display:grid;grid-template-columns:repeat(4,1fr);
+ gap:10px;
+}
+.key{
+ height:66px;border:1px solid var(--line);
+ border-radius:17px;background:var(--panel);
+ color:var(--text);font-size:21px;
+ font-weight:650;box-shadow:0 3px 8px #00000008;
+ transition:transform .12s,background .12s;
+}
+.key:active,.science button:active{transform:scale(.95)}
+.key.operator{
+ background:#e0f0e4;color:var(--darkgreen);
+ border-color:transparent;
+}
+body.dark .key.operator{
+ background:#314b38;color:#b8efc5;
+}
+.key.special{
+ background:#fff0dc;color:#bd6500;
+ border-color:transparent;
+}
+body.dark .key.special{
+ background:#4c3927;color:#ffc17c;
+}
+.key.equal{
+ background:linear-gradient(135deg,var(--green),var(--darkgreen));
+ color:white;border:0;
+ box-shadow:0 7px 16px #147d4530;
+}
+.key.zero{grid-column:span 2}
+.history{
+ display:none;margin-top:18px;
+ background:var(--panel);border:1px solid var(--line);
+ border-radius:18px;padding:16px;
+}
+.history.show{display:block}
+.history-head{
+ display:flex;justify-content:space-between;
+ align-items:center;margin-bottom:12px;
+}
+.history-head h3{font-size:15px;margin:0}
+.history-head button{
+ border:0;background:transparent;color:#e16a39;
+ font-weight:700;font-size:12px;
+}
+.history-item{
+ padding:12px 0;border-bottom:1px solid var(--line);
+ cursor:pointer;
+}
+.history-item:last-child{border:0}
+.history-q{text-align:right;color:var(--muted);font-size:12px}
+.history-a{text-align:right;font-size:18px;font-weight:700;margin-top:5px}
+.empty{text-align:center;padding:20px;color:var(--muted);font-size:13px}
+.footer{text-align:center;margin-top:24px;color:var(--muted);font-size:11px}
+.footer b{color:var(--green)}
+.toast{
+ position:fixed;bottom:25px;left:50%;
+ transform:translateX(-50%);
+ background:#17251c;color:white;
+ padding:11px 18px;border-radius:12px;
+ font-size:13px;opacity:0;pointer-events:none;
+ transition:.2s;z-index:10;
+}
+.toast.show{opacity:1}
+@media(max-width:360px){
+ .app{padding:15px 11px}
+ .key{height:58px}
+ .science{gap:5px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header class="header">
+ <div class="brand">
+  <div class="logo">M</div>
+  <div>
+   <h1>MANJESH Calculator</h1>
+   <p>Smart Calculations. Simple Experience.</p>
+  </div>
+ </div>
+ <button class="icon-btn" id="themeBtn" aria-label="Toggle theme">☾</button>
+</header>
+
+<section class="display-card">
+ <div class="display-label">Your Calculation</div>
+ <div class="expression" id="expression">Ready to calculate</div>
+ <input class="result" id="result" value="0" readonly>
+ <div class="display-footer">
+  <span class="status" id="status">Standard Calculator</span>
+  <div class="small-actions">
+   <button class="small-btn" id="copyBtn">Copy</button>
+   <button class="small-btn" id="historyBtn">History</button>
+  </div>
+ </div>
+</section>
+
+<div class="tabs">
+ <button class="tab active" id="basicTab">Basic</button>
+ <button class="tab" id="scientificTab">Scientific</button>
+</div>
+
+<div class="science" id="science">
+ <button data-insert="sin(">sin</button>
+ <button data-insert="cos(">cos</button>
+ <button data-insert="tan(">tan</button>
+ <button data-insert="sqrt(">√</button>
+ <button data-insert="log(">log</button>
+ <button data-insert="ln(">ln</button>
+ <button data-insert="abs(">abs</button>
+ <button data-insert="^">xʸ</button>
+ <button data-insert="(">(</button>
+ <button data-insert=")">)</button>
+ <button data-insert="pi">π</button>
+ <button data-insert="e">e</button>
+</div>
+
+<div class="keypad">
+ <button class="key special" data-action="clear">AC</button>
+ <button class="key special" data-action="delete">⌫</button>
+ <button class="key special" data-insert="%">%</button>
+ <button class="key operator" data-insert="/">÷</button>
+
+ <button class="key" data-insert="7">7</button>
+ <button class="key" data-insert="8">8</button>
+ <button class="key" data-insert="9">9</button>
+ <button class="key operator" data-insert="*">×</button>
+
+ <button class="key" data-insert="4">4</button>
+ <button class="key" data-insert="5">5</button>
+ <button class="key" data-insert="6">6</button>
+ <button class="key operator" data-insert="-">−</button>
+
+ <button class="key" data-insert="1">1</button>
+ <button class="key" data-insert="2">2</button>
+ <button class="key" data-insert="3">3</button>
+ <button class="key operator" data-insert="+">+</button>
+
+ <button class="key special" data-action="sign">±</button>
+ <button class="key zero" data-insert="0">0</button>
+ <button class="key" data-insert=".">.</button>
+ <button class="key equal" data-action="calculate">=</button>
+</div>
+
+<section class="history" id="history">
+ <div class="history-head">
+  <h3>Calculation History</h3>
+  <button id="clearHistory">CLEAR ALL</button>
+ </div>
+ <div id="historyList"></div>
+</section>
+
+<footer class="footer">
+ <b>MANJESH Calculator</b><br>
+ Smart Calculations. Simple Experience.<br><br>
+ © 2026 MANJESH. All Rights Reserved.
+</footer>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+const $=id=>document.getElementById(id);
+let expr="";
+let answer="0";
+let calculated=false;
+let history=loadHistory();
+
+function loadHistory(){
+ try{return JSON.parse(localStorage.getItem("manjesh_history")||"[]")}
+ catch{return []}
+}
+function saveHistory(){
+ try{localStorage.setItem("manjesh_history",JSON.stringify(history))}
+ catch{}
+}
+function pretty(s){
+ return s.replaceAll("*","×").replaceAll("/","÷")
+  .replaceAll("pi","π");
+}
+function render(){
+ $("result").value=expr||"0";
+ $("expression").textContent=expr?pretty(expr):"Ready to calculate";
+}
+function toast(message){
+ const el=$("toast");
+ el.textContent=message;
+ el.classList.add("show");
+ clearTimeout(window.toastTimer);
+ window.toastTimer=setTimeout(()=>el.classList.remove("show"),1800);
+}
+function insert(value){
+ if(calculated && /[0-9.]/.test(value)){
+  expr="";
+ }
+ calculated=false;
+ if(expr==="0" && /^[0-9]$/.test(value))expr="";
+ expr+=value;
+ render();
+}
+function clearAll(){
+ expr="";
+ calculated=false;
+ render();
+}
+function deleteLast(){
+ if(calculated){clearAll();return}
+ expr=expr.slice(0,-1);
+ render();
+}
+function changeSign(){
+ if(!expr)return;
+ expr=expr.startsWith("-")?expr.slice(1):"-("+expr+")";
+ calculated=false;
+ render();
+}
+
+/* Safe expression parser: no eval() or Function() */
+function evaluate(source){
+ const pattern=/\s*(\d+(?:\.\d*)?|\.\d+|[a-zA-Z]+|[()+\-*/%^])\s*/gy;
+ let tokens=[],pos=0;
+ while(pos<source.length){
+  pattern.lastIndex=pos;
+  let m=pattern.exec(source);
+  if(!m)throw Error("Invalid input");
+  tokens.push(m[1]);
+  pos=pattern.lastIndex;
+ }
+ let i=0;
+ const peek=()=>tokens[i];
+ const next=()=>tokens[i++];
+
+ function primary(){
+  let t=next();
+  if(t==="("){
+   let v=add();
+   if(next()!==")")throw Error("Bracket mismatch");
+   return v;
+  }
+  if(t==="pi")return Math.PI;
+  if(t==="e")return Math.E;
+  if(["sin","cos","tan","sqrt","log","ln","abs"].includes(t)){
+   if(next()!=="(")throw Error("Function error");
+   let v=add();
+   if(next()!==")")throw Error("Bracket mismatch");
+   if(t==="sin")return Math.sin(v*Math.PI/180);
+   if(t==="cos")return Math.cos(v*Math.PI/180);
+   if(t==="tan")return Math.tan(v*Math.PI/180);
+   if(t==="sqrt")return Math.sqrt(v);
+   if(t==="log")return Math.log10(v);
+   if(t==="ln")return Math.log(v);
+   return Math.abs(v);
+  }
+  if(!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(t||""))
+   throw Error("Number error");
+  return Number(t);
+ }
+ function unary(){
+  if(peek()==="+"){next();return unary()}
+  if(peek()==="-"){next();return -unary()}
+  return power();
+ }
+ function power(){
+  let a=primary();
+  if(peek()==="^"){next();a=Math.pow(a,unary())}
+  while(peek()==="%"){next();a/=100}
+  return a;
+ }
+ function multiply(){
+  let a=unary();
+  while(["*","/"].includes(peek())){
+   let op=next(),b=unary();
+   a=op==="*"?a*b:a/b;
+  }
+  return a;
+ }
+ function add(){
+  let a=multiply();
+  while(peek()==="+"||peek()==="-"){
+   let op=next(),b=multiply();
+   a=op==="+"?a+b:a-b;
+  }
+  return a;
+ }
+ if(!tokens.length)throw Error("Empty");
+ let value=add();
+ if(i!==tokens.length||!Number.isFinite(value))
+  throw Error("Math error");
+ return value;
+}
+
+function calculate(){
+ if(!expr)return;
+ try{
+  const original=expr;
+  const value=evaluate(expr);
+  const output=Number(value.toPrecision(12)).toString();
+  if(history.length===0 || history[0].q!==original || history[0].a!==output){
+   history.unshift({q:original,a:output});
+   history=history.slice(0,50);
+   saveHistory();
+  }
+  answer=output;
+  $("expression").textContent=pretty(original)+" =";
+  expr=output;
+  $("result").value=output;
+  calculated=true;
+  renderHistory();
+ }catch(error){
+  toast("Please check your calculation");
+ }
+}
+
+function renderHistory(){
+ const list=$("historyList");
+ list.replaceChildren();
+ if(!history.length){
+  const empty=document.createElement("div");
+  empty.className="empty";
+  empty.textContent="No calculations yet";
+  list.appendChild(empty);
+  return;
+ }
+ history.forEach(item=>{
+  const row=document.createElement("div");
+  row.className="history-item";
+  const q=document.createElement("div");
+  q.className="history-q";
+  q.textContent=pretty(item.q);
+  const a=document.createElement("div");
+  a.className="history-a";
+  a.textContent=item.a;
+  row.append(q,a);
+  row.addEventListener("click",()=>{
+   expr=item.a;calculated=true;render();
+   $("history").classList.remove("show");
+  });
+  list.appendChild(row);
+ });
+}
+function clearHistory(){
+ history=[];
+ saveHistory();
+ renderHistory();
+ toast("History cleared");
+}
+async function copyResult(){
+ try{
+  await navigator.clipboard.writeText($("result").value);
+  toast("Result copied");
+ }catch{
+  toast("Copy unavailable in this browser");
+ }
+}
+function setMode(mode){
+ const scientific=mode==="scientific";
+ $("science").classList.toggle("show",scientific);
+ $("basicTab").classList.toggle("active",!scientific);
+ $("scientificTab").classList.toggle("active",scientific);
+ $("status").textContent=scientific?"Scientific Calculator":"Standard Calculator";
+}
+function toggleTheme(){
+ const dark=document.body.classList.toggle("dark");
+ $("themeBtn").textContent=dark?"☀":"☾";
+ try{localStorage.setItem("manjesh_theme",dark?"dark":"light")}catch{}
+}
+
+/* Button events */
+document.querySelectorAll("[data-insert]").forEach(btn=>{
+ btn.addEventListener("click",()=>insert(btn.dataset.insert));
+});
+document.querySelectorAll("[data-action]").forEach(btn=>{
+ btn.addEventListener("click",()=>{
+  const action=btn.dataset.action;
+  if(action==="clear")clearAll();
+  if(action==="delete")deleteLast();
+  if(action==="sign")changeSign();
+  if(action==="calculate")calculate();
+ });
+});
+document.querySelectorAll(".science button").forEach(btn=>{
+ btn.addEventListener("click",()=>insert(btn.dataset.insert));
+});
+$("basicTab").onclick=()=>setMode("basic");
+$("scientificTab").onclick=()=>setMode("scientific");
+$("themeBtn").onclick=toggleTheme;
+$("copyBtn").onclick=copyResult;
+$("historyBtn").onclick=()=>{
+ $("history").classList.toggle("show");
+ renderHistory();
+};
+$("clearHistory").onclick=clearHistory;
+
+/* Keyboard support */
+document.addEventListener("keydown",event=>{
+ if(/^[0-9.]$/.test(event.key))insert(event.key);
+ else if(["+","-","*","/","(",")","%","^"].includes(event.key))insert(event.key);
+ else if(event.key==="Enter")calculate();
+ else if(event.key==="Backspace")deleteLast();
+ else if(event.key==="Escape")clearAll();
+});
+
+try{
+ if(localStorage.getItem("manjesh_theme")==="dark")
+  document.body.classList.add("dark");
+}catch{}
+$("themeBtn").textContent=document.body.classList.contains("dark")?"☀":"☾";
+render();
+renderHistory();
+</script>
+</body>
+</html>
